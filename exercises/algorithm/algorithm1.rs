@@ -2,11 +2,11 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
+
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
-use std::vec::*;
+
 
 #[derive(Debug)]
 struct Node<T> {
@@ -35,15 +35,15 @@ impl<T> Default for LinkedList<T> {
     }
 }
 
-impl<T> LinkedList<T> {
-    pub fn new() -> Self {
+impl<T> LinkedList<T> 
+{
+	pub fn new() -> Self {
         Self {
             length: 0,
             start: None,
             end: None,
         }
     }
-
     pub fn add(&mut self, obj: T) {
         let mut node = Box::new(Node::new(obj));
         node.next = None;
@@ -69,14 +69,49 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+}
+impl<T> LinkedList<T>
+where T: std::cmp::PartialOrd + Copy,
+{
+	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self 
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
+		let mut result = LinkedList::new();
+    
+    	let mut current_a = list_a.start;
+    	let mut current_b = list_b.start;
+
+    // 双指针遍历两个链表
+    	while let (Some(ptr_a), Some(ptr_b)) = (current_a, current_b) {
+        	unsafe {
+            	let val_a = &(*ptr_a.as_ptr()).val;
+            	let val_b = &(*ptr_b.as_ptr()).val;
+
+            	if *val_a <= *val_b {
+                	result.add(*val_a);
+                	current_a = (*ptr_a.as_ptr()).next;
+            	} else {
+                	result.add(*val_b);
+                	current_b = (*ptr_b.as_ptr()).next;
+           		}
+        	}
+    	}
+
+    // 添加剩余元素
+    	while let Some(ptr_a) = current_a {
+        	unsafe {
+            	result.add((*ptr_a.as_ptr()).val);
+            	current_a = (*ptr_a.as_ptr()).next;
+        	}
+    	}
+
+    	while let Some(ptr_b) = current_b {
+        	unsafe {
+            	result.add((*ptr_b.as_ptr()).val);
+            	current_b = (*ptr_b.as_ptr()).next;
+        	}
+    	}
+
+    	result
 	}
 }
 
